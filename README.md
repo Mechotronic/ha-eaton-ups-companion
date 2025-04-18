@@ -6,8 +6,8 @@
 This integration enables Home Assistant to communicate with an Eaton UPS Companion device. It provides sensor data and allows users to monitor their power backup systems.
 
 <p>
-    <img src="https://github.com/sockless-coding/ha-eaton-ups-companion/raw/master/doc/sensors.png" alt="Example sensors" style="vertical-align: top;max-width:100%" align="top" />
-    <img src="https://github.com/sockless-coding/ha-eaton-ups-companion/raw/master/doc/diagnostics.png" alt="Example diagnostics" style="vertical-align: top;max-width:100%" align="top" />
+    <img src="https://github.com/sockless-coding/ha-eaton-ups-companion/raw/main/doc/sensors.png" alt="Example sensors" style="vertical-align: top;max-width:100%" align="top" />
+    <img src="https://github.com/sockless-coding/ha-eaton-ups-companion/raw/main/doc/diagnostics.png" alt="Example diagnostics" style="vertical-align: top;max-width:100%" align="top" />
 </p>
 
 ## Installation
@@ -31,8 +31,8 @@ This integration provides the following features:
 
 The integration includes the following sensors:
 
-* [Sensors](doc/sensors.png)
-* [Diagnostic](doc/diagnostics.png)
+* ![Sensors](doc/sensors.png)
+* ![Diagnostic](doc/diagnostics.png)
 
 
 ## Known Issues
