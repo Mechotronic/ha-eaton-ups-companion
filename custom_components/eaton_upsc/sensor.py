@@ -4,7 +4,23 @@ import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.const import UnitOfTemperature, EntityCategory
+from homeassistant.const import (
+    ATTR_MANUFACTURER,
+    ATTR_MODEL,
+    ATTR_SERIAL_NUMBER,
+    ATTR_SW_VERSION,
+    PERCENTAGE,
+    STATE_UNKNOWN,
+    EntityCategory,
+    UnitOfApparentPower,
+    UnitOfElectricCurrent,
+    UnitOfElectricPotential,
+    UnitOfFrequency,
+    UnitOfPower,
+    UnitOfTemperature,
+    UnitOfTime,
+    UnitOfEnergy,
+)
 from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
@@ -14,7 +30,12 @@ from homeassistant.components.sensor import (
 
 from eaton_ups_companion.models import EUCResponse
 
-from .const import DOMAIN
+from .const import (
+    DOMAIN,
+    STATUS_ON_BATTERY,
+    STATUS_ON_UTILITY,
+    UPS_STATUS
+    )
 from .coordinator import EatonUPSCoordinator
 from .base import EatonUPSDataEntity
 
@@ -27,10 +48,18 @@ class EatonUPSSensorEntityDescription(SensorEntityDescription):
     is_available: Callable[[EUCResponse], bool] = None
 SENSOR_DESCRIPTIONS = [
     EatonUPSSensorEntityDescription(
+        key = "status",
+        name="Status",
+        device_class=SensorDeviceClass.ENUM,
+        options=UPS_STATUS,
+        get_state=lambda data: STATUS_ON_UTILITY if data.status.acPresent else STATUS_ON_BATTERY,
+        is_available=lambda data: True
+    ),
+    EatonUPSSensorEntityDescription(
         key = "output_power",
         name="Output power",
         icon="mdi:flash",
-        native_unit_of_measurement="W",
+        native_unit_of_measurement=UnitOfPower.WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
         get_state=lambda data: data.status.outputPower,
@@ -40,7 +69,7 @@ SENSOR_DESCRIPTIONS = [
         key = "nominal_power",
         name="Nominal power",
         icon="mdi:flash",
-        native_unit_of_measurement="W",
+        native_unit_of_measurement=UnitOfPower.WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
         get_state=lambda data: data.status.nominalPower,
@@ -50,29 +79,46 @@ SENSOR_DESCRIPTIONS = [
         key = "energy",
         name="Energy",
         icon="mdi:flash",
-        native_unit_of_measurement="kWh",
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
-        get_state=lambda data: data.status.energy / 3600000,
+        get_state=lambda data: round(data.status.energy / 3600000,2),
         is_available=lambda data: True
     ),
     EatonUPSSensorEntityDescription(
         key = "output_load_level",
         name="Load",
         icon="mdi:percent-box-outline",
-        native_unit_of_measurement="%",
+        native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         get_state=lambda data: data.status.outputLoadLevel,
         is_available=lambda data: True
     ),
     EatonUPSSensorEntityDescription(
+        key = "output_voltage",
+        name="Output voltage",
+        native_unit_of_measurement=UnitOfElectricPotential.VOLT,
+        device_class=SensorDeviceClass.VOLTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        get_state=lambda data: data.powerSourceCfg.outputVoltage,
+        is_available=lambda data: True
+    ),
+    EatonUPSSensorEntityDescription(
         key = "battery_charge",
         name="Battery charge",
-        icon="mdi:percent-box-outline",
-        native_unit_of_measurement="%",
+        native_unit_of_measurement=PERCENTAGE,
         device_class=SensorDeviceClass.BATTERY,
         state_class=SensorStateClass.MEASUREMENT,
         get_state=lambda data: data.status.batteryCapacity,
+        is_available=lambda data: True
+    ),
+    EatonUPSSensorEntityDescription(
+        key = "battery_runtime",
+        name="Battery runtime",
+        native_unit_of_measurement=UnitOfTime.SECONDS,
+        device_class=SensorDeviceClass.DURATION,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        get_state=lambda data: data.status.batteryRunTime,
         is_available=lambda data: True
     )
 ]

@@ -37,7 +37,7 @@ class EatonUPSCoordinator(DataUpdateCoordinator[EUCResponse]):
         return DeviceInfo(
             identifiers={(DOMAIN, self._device_id )},
             manufacturer=self._data.sysInfo.manufacturer,
-            model=self._data.deviceInfo.model,
+            model=f"{self._data.deviceInfo.product} {self._data.deviceInfo.model}",
             name=self._data.sysInfo.name,
             sw_version=f"{self._data.sysInfo.vMajor}.{self._data.sysInfo.vMinor}.{self._data.sysInfo.vBuild}"
         )

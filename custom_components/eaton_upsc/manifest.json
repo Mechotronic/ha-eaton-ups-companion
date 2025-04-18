@@ -1,5 +1,5 @@
 {
-    "domain": "eatonupsc",
+    "domain": "eaton_upsc",
     "name": "Eaton UPS Companion",
     "after_dependencies": ["http"],
     "version": "2025.4.0",
