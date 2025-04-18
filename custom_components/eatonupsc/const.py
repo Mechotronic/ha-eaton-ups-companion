@@ -1,0 +1,8 @@
+DOMAIN = "eatonupsc"
+
+DEFAULT_PORT = 4679
+DEFAULT_SCAN_INTERVAL = 30
+
+PLATFORMS = ["sensor"]
+DATA_COORDINATOR = "coordinator"
+
