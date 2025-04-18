@@ -32,9 +32,17 @@ from eaton_ups_companion.models import EUCResponse
 
 from .const import (
     DOMAIN,
-    STATUS_ON_BATTERY,
-    STATUS_ON_UTILITY,
-    UPS_STATUS
+    RUNNING_ON_BATTERY,
+    RUNNING_ON_UTILITY,
+    BATTERY_STATUS_CHARGING,
+    BATTERY_STATUS_DISCHARGING,
+    BATTERY_STATUS_FLOATING,
+    STATUS_NORMAL,
+    STATUS_BATTERY_LOW,
+    STATUS_BATTERY_FAULT,
+    STATUS_OVERLOADED,
+    STATUS_SHUTDOWN_IMMINENT,
+    STATUS_INTERNAL_FAILURE,
     )
 from .coordinator import EatonUPSCoordinator
 from .base import EatonUPSDataEntity
@@ -45,15 +53,36 @@ _LOGGER = logging.getLogger(__name__)
 class EatonUPSSensorEntityDescription(SensorEntityDescription):
     """Describes Panasonic sensor entity."""
     get_state: Callable[[EUCResponse], Any] = None
-    is_available: Callable[[EUCResponse], bool] = None
 SENSOR_DESCRIPTIONS = [
+    EatonUPSSensorEntityDescription(
+        key = "running",
+        name="Running",
+        device_class=SensorDeviceClass.ENUM,
+        options=[RUNNING_ON_BATTERY, RUNNING_ON_UTILITY],
+        get_state=lambda data: RUNNING_ON_UTILITY if data.status.acPresent else RUNNING_ON_BATTERY
+    ),
+    EatonUPSSensorEntityDescription(
+        key = "battery_status",
+        name="Battery status",
+        device_class=SensorDeviceClass.ENUM,
+        options=[BATTERY_STATUS_CHARGING, BATTERY_STATUS_DISCHARGING, BATTERY_STATUS_FLOATING],
+        get_state=lambda data: 
+            BATTERY_STATUS_CHARGING if data.status.charging 
+            else BATTERY_STATUS_DISCHARGING if data.status.discharging 
+            else BATTERY_STATUS_FLOATING,
+    ),
     EatonUPSSensorEntityDescription(
         key = "status",
         name="Status",
         device_class=SensorDeviceClass.ENUM,
-        options=UPS_STATUS,
-        get_state=lambda data: STATUS_ON_UTILITY if data.status.acPresent else STATUS_ON_BATTERY,
-        is_available=lambda data: True
+        options=[STATUS_NORMAL,STATUS_BATTERY_LOW,STATUS_BATTERY_FAULT,STATUS_OVERLOADED,STATUS_SHUTDOWN_IMMINENT,STATUS_INTERNAL_FAILURE],
+        get_state=lambda data: 
+            STATUS_BATTERY_FAULT if data.status.batteryFault 
+            else STATUS_INTERNAL_FAILURE if data.status.internalFailure
+            else STATUS_OVERLOADED if data.status.overload
+            else STATUS_SHUTDOWN_IMMINENT if data.status.shutdownImminent 
+            else STATUS_BATTERY_LOW if data.status.batteryLow 
+            else STATUS_NORMAL,
     ),
     EatonUPSSensorEntityDescription(
         key = "output_power",
@@ -63,7 +92,6 @@ SENSOR_DESCRIPTIONS = [
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
         get_state=lambda data: data.status.outputPower,
-        is_available=lambda data: True
     ),
     EatonUPSSensorEntityDescription(
         key = "nominal_power",
@@ -72,8 +100,8 @@ SENSOR_DESCRIPTIONS = [
         native_unit_of_measurement=UnitOfPower.WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
         get_state=lambda data: data.status.nominalPower,
-        is_available=lambda data: True
     ),
     EatonUPSSensorEntityDescription(
         key = "energy",
@@ -83,7 +111,6 @@ SENSOR_DESCRIPTIONS = [
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         get_state=lambda data: round(data.status.energy / 3600000,2),
-        is_available=lambda data: True
     ),
     EatonUPSSensorEntityDescription(
         key = "output_load_level",
@@ -92,7 +119,6 @@ SENSOR_DESCRIPTIONS = [
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         get_state=lambda data: data.status.outputLoadLevel,
-        is_available=lambda data: True
     ),
     EatonUPSSensorEntityDescription(
         key = "output_voltage",
@@ -101,7 +127,6 @@ SENSOR_DESCRIPTIONS = [
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         get_state=lambda data: data.powerSourceCfg.outputVoltage,
-        is_available=lambda data: True
     ),
     EatonUPSSensorEntityDescription(
         key = "battery_charge",
@@ -109,8 +134,7 @@ SENSOR_DESCRIPTIONS = [
         native_unit_of_measurement=PERCENTAGE,
         device_class=SensorDeviceClass.BATTERY,
         state_class=SensorStateClass.MEASUREMENT,
-        get_state=lambda data: data.status.batteryCapacity,
-        is_available=lambda data: True
+        get_state=lambda data: data.status.batteryCapacity
     ),
     EatonUPSSensorEntityDescription(
         key = "battery_runtime",
@@ -118,8 +142,7 @@ SENSOR_DESCRIPTIONS = [
         native_unit_of_measurement=UnitOfTime.SECONDS,
         device_class=SensorDeviceClass.DURATION,
         entity_category=EntityCategory.DIAGNOSTIC,
-        get_state=lambda data: data.status.batteryRunTime,
-        is_available=lambda data: True
+        get_state=lambda data: data.status.batteryRunTime
     )
 ]
 
@@ -142,12 +165,6 @@ class EatonUPSSensorEntity(EatonUPSDataEntity, SensorEntity):
         self.entity_description = description
         super().__init__(coordinator, description.key)
 
-    @property
-    def available(self) -> bool:
-        """Return if entity is available."""
-        return self.entity_description.is_available(self.coordinator.data)
-
     def _async_update_attrs(self) -> None:
         """Update the attributes of the sensor."""
-        self._attr_available = self.entity_description.is_available(self.coordinator.data)
         self._attr_native_value = self.entity_description.get_state(self.coordinator.data)
