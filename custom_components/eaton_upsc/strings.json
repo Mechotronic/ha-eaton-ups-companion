@@ -1,0 +1,32 @@
+{
+    "entity": {
+        "sensor": {
+            "running": {
+                "name": "Running",
+                "state": {
+                    "on_utility": "On Utility",
+                    "on_battery": "On Battery"
+                }
+            },
+            "battery_status": {
+                "name": "Battery status",
+                "state": {
+                    "charging": "Charging",
+                    "discharging": "Discharging",
+                    "floating": "Floating"
+                }
+            },
+            "status": {
+                "name": "Status",
+                "state": {
+                    "normal": "Normal",
+                    "battery_low": "Battery Low",
+                    "battery_fault": "Battery Fault",
+                    "overloaded": "Overloaded",
+                    "shutdown_imminent": "Shutdown Imminent",
+                    "internal_failure": "Internal Failure"
+                }
+            }
+        }
+    }
+}

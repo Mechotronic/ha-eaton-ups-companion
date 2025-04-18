@@ -1,0 +1,29 @@
+{
+    "entity":{
+        "sensor":{
+            "running":{
+                "state":{
+                    "on_utility":"mdi:power-plug",
+                    "on_battery":"mdi:battery"
+                }
+            },
+            "battery_status":{
+                "state":{
+                    "charging":"mdi:battery-charging",
+                    "discharging":"mdi:battery-outline",
+                    "floating":"mdi:battery"
+                }
+            },
+            "status":{
+                "state":{
+                    "normal":"mdi:check-circle",
+                    "battery_low":"mdi:alert-outline",
+                    "battery_fault":"mdi:alert",
+                    "overloaded":"mdi:alert",
+                    "shutdown_imminent":"mdi:alert",
+                    "internal_failure":"mdi:alert"
+                }
+            }
+        }
+    }
+}
