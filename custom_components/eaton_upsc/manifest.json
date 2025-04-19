@@ -2,14 +2,14 @@
     "domain": "eaton_upsc",
     "name": "Eaton UPS Companion",
     "after_dependencies": ["http"],
-    "version": "2025.4.0",
-    "config_flow": true,
-    "documentation": "https://github.com/sockless-coding/ha-eaton-ups-companion/",
-    "dependencies": [],
     "codeowners": ["@sockless-coding"],
+    "config_flow": true,
+    "dependencies": [],
+    "documentation": "https://github.com/sockless-coding/ha-eaton-ups-companion/",
     "integration_type": "device",
     "iot_class": "local_polling",
     "issue_tracker": "https://github.com/sockless-coding/ha-eaton-ups-companion/issues",
+    "quality_scale": "silver",
     "requirements": ["aiohttp","eaton-ups-companion"],
-    "quality_scale": "silver"
+    "version": "2025.4.0"
   }
