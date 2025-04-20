@@ -1,4 +1,19 @@
 {
+    "config": {
+        "step": {
+            "user": {
+                "description": "Connect to Eaton UPS Companion",
+                "data": {
+                    "host": "Host",
+                    "port": "Port",
+                    "scan_interval": "Scan Interval (seconds)"
+                },
+                "data_description": {
+                    "host": "The hostname or IP address of the machine running Eaton UPS Companion."
+                }
+            }
+        }
+    },
     "entity": {
         "sensor": {
             "running": {
