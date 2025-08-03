@@ -10,6 +10,6 @@
     "iot_class": "local_polling",
     "issue_tracker": "https://github.com/sockless-coding/ha-eaton-ups-companion/issues",
     "quality_scale": "silver",
-    "requirements": ["aiohttp","eaton-ups-companion@git+https://github.com/Mechotronic/eaton-ups-companion.git@master"],
+    "requirements": ["aiohttp","eaton-ups-companion@git+https://github.com/Mechotronic/eaton-ups-companion.git@main"],
     "version": "2025.4.0"
   }
